@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriEco Mobile App - Fullscreen Optimized</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eco: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .active-tab { color: #059669; font-weight: 700; }
+        .active-tab i { transform: translateY(-2px); transition: all 0.2s ease; }
+
+        /* Notification Drawer Animation From Right */
+        .notif-drawer {
+            transition: transform 0.3s ease-in-out;
+        }
+        .notif-drawer.closed {
+            transform: translateX(100%);
+        }
+        .notif-drawer.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex justify-center items-center">
+
+    <!-- FULLSCREEN RESPONSIVE WRAPPER WITH MOBILE OPTIMIZED CONTENT CONTAINER -->
+    <div class="w-full h-screen flex flex-col bg-slate-50 relative overflow-hidden">
+
+        <!-- GLOBAL HEADER -->
+        <header class="bg-gradient-to-r from-emerald-700 to-teal-600 text-white shadow-md z-20 flex-shrink-0">
+            <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-full bg-white/20 p-1 flex items-center justify-center border border-white/30">
+                        <i class="fa-solid fa-leaf text-emerald-200 text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base tracking-tight leading-none">NutriEco</h1>
+                        <p class="text-[10px] text-emerald-100 opacity-90 mt-0.5">Nourish Body, Save Kitchen</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <!-- Notification Trigger Button -->
+                    <button onclick="toggleNotificationDrawer(true)" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
+                        <i class="fa-solid fa-bell text-xs"></i>
+                        <span id="notif-badge" class="absolute top-1 right-1 w-2 h-2 bg-amber-400 rounded-full"></span>
+                    </button>
+                    <!-- Profile Avatar Button -->
+                    <button onclick="switchTab('profile')" class="w-8 h-8 rounded-full bg-amber-400 text-emerald-900 font-bold flex items-center justify-center text-xs shadow border border-white/40">
+                        <span id="header-avatar-initial">A</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE CONTENT AREA -->
+        <main id="app-content" class="flex-1 overflow-y-auto no-scrollbar pb-24 bg-slate-50">
+            <div class="max-w-md mx-auto min-h-full">
+
+                <!-- PAGE 1: REVISED HOME PAGE -->
+                <section id="page-home" class="p-4 space-y-4">
+                    
+                    <!-- 1. Greeting Card with Interactive Live Index Popup -->
+                    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-4 text-white shadow-lg relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] bg-emerald-500/40 border border-emerald-300/30 px-2.5 py-0.5 rounded-full text-emerald-100 font-medium">
+                                    <i class="fa-solid fa-smile mr-1 text-amber-300"></i> Welcome Back
+                                </span>
+                                <h2 class="text-lg font-bold mt-1.5" id="home-greeting-name">Hello, Alex! 👋</h2>
+                                <p class="text-xs text-emerald-100 mt-0.5">Eat Well, Stay Fit, Save Kitchen</p>
+                            </div>
+                            <!-- Interactive Live Index Score Trigger -->
+                            <div onclick="openModal('modal-live-index-detail')" class="cursor-pointer bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-2xl text-center border border-white/20 hover:bg-white/30 transition active:scale-95 shadow-sm">
+                                <span class="text-[9px] uppercase tracking-wider text-emerald-200 block font-semibold flex items-center justify-center">
+                                    Live Index <i class="fa-solid fa-circle-info text-[9px] ml-1 opacity-80"></i>
+                                </span>
+                                <span class="text-lg font-black text-amber-300">86<span class="text-xs font-normal text-white">/100</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Health & Food Tracker Section -->
+                    <div class="space-y-3">
+                        <!-- Daily Nutrition Intake Card with Quick Log Button -->
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xs font-bold text-slate-800 flex items-center">
+                                    <i class="fa-solid fa-chart-simple text-emerald-600 mr-1.5"></i> Daily Nutrition Intake
+                                </h3>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-[11px] font-bold text-emerald-600" id="home-calories-text">1,240 / 1,800 kcal</span>
+                                    <button onclick="startAddMealFlow()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm flex items-center space-x-1 transition active:scale-95">
+                                        <i class="fa-solid fa-camera text-[9px]"></i>
+                                        <span>+ Log</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                <div id="home-calories-bar" class="bg-emerald-500 h-full w-[68%] rounded-full transition-all duration-300"></div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
+                                <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-100/50">
+                                    <span class="text-slate-400 block text-[9px]">Carbs</span>
+                                    <span class="font-bold text-slate-700 text-xs">140g / 220g</span>
+                                </div>
+                                <div class="bg-teal-50/60 p-2 rounded-xl border border-teal-100/50">
+                                    <span class="text-slate-400 block text-[9px]">Protein</span>
+                                    <span class="font-bold text-slate-700 text-xs">55g / 75g</span>
+                                </div>
+                                <div class="bg-amber-50/60 p-2 rounded-xl border border-amber-100/50">
+                                    <span class="text-slate-400 block text-[9px]">Healthy Fats</span>
+                                    <span class="font-bold text-slate-700 text-xs">38g / 50g</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Compact Water Intake Widget -->
+                        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-3.5 border border-blue-100 shadow-sm flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                                    <i class="fa-solid fa-droplet"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[9px] uppercase tracking-wider font-extrabold text-blue-600 block">Water Intake</span>
+                                    <div class="flex items-baseline space-x-1">
+                                        <span id="home-water-display" class="font-extrabold text-slate-800 text-sm">1.8</span>
+                                        <span class="text-[10px] text-slate-500 font-semibold">/ 2.5 L</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <button onclick="updateWater(-0.25)" class="w-7 h-7 bg-white text-slate-600 rounded-lg border border-blue-200 flex items-center justify-center font-bold text-xs hover:bg-slate-100 transition shadow-xs">-</button>
+                                <button onclick="updateWater(0.25)" class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-xs hover:bg-blue-700 transition shadow-xs">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Responsible Consumption (Eco & Anti-Waste Aspect) -->
+                    <!-- Eco Impact Preview Widget -->
+                    <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white rounded-2xl p-3.5 shadow-sm border border-emerald-700/50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] bg-emerald-500/30 border border-emerald-400/30 text-emerald-200 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                                <i class="fa-solid fa-leaf text-amber-300 mr-1"></i> Eco Impact Preview
+                            </span>
+                            <span class="text-[9px] text-emerald-200">This Month</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-0.5">
+                            <div class="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10 flex items-center space-x-2">
+                                <div class="text-xl">🥗</div>
+                                <div>
+                                    <span class="text-[9px] text-emerald-200 block leading-tight">Food Saved</span>
+                                    <span class="text-xs font-black text-white">1.8 kg</span>
+                                </div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10 flex items-center space-x-2">
+                                <div class="text-xl">💰</div>
+                                <div>
+                                    <span class="text-[9px] text-emerald-200 block leading-tight">Est. Savings</span>
+                                    <span class="text-xs font-black text-amber-300">Rp150.000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Refrigerator Alert Card with Direct Recipe Preview -->
+                    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 shadow-sm space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-clock-rotate-left text-rose-500 text-sm"></i>
+                                <h3 class="font-bold text-slate-800 text-xs">Items Expiring Soon</h3>
+                            </div>
+                            <span id="expiring-badge" class="text-[9px] bg-rose-200 text-rose-900 font-bold px-2 py-0.5 rounded-full">0 Items</span>
+                        </div>
+                        
+                        <div id="home-expiring-list" class="grid grid-cols-2 gap-2 text-xs">
+                            <!-- Dynamic items rendered via JS -->
+                        </div>
+
+                        <!-- Direct Recipe Preview Based on Stock -->
+                        <div onclick="openRecipeDetail(1)" class="cursor-pointer bg-white hover:bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl shadow-xs transition space-y-1 group">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1"></i> Recipe Preview
+                                </span>
+                                <span class="text-[10px] text-emerald-600 font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
+                                    Cook Now <i class="fa-solid fa-arrow-right text-[8px] ml-1"></i>
+                                </span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 leading-snug">
+                                Cook Fresh Spinach & White Tofu into Spinach Tofu Soup <span class="text-emerald-600 font-normal">(15 Min)</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 4. Personalized Edu-Card Module (Horizontal Carousel) -->
+                    <div class="space-y-2 pt-1">
+                        <div class="flex justify-between items-center px-0.5">
+                            <h3 class="text-xs font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-lightbulb text-amber-500 mr-1.5"></i> Smart Edu-Cards
+                            </h3>
+                            <span class="text-[10px] text-emerald-600 font-semibold">Tailored for You</span>
+                        </div>
+
+                        <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
+                            <!-- Card 1: Based on Fridge Stock -->
+                            <div class="flex-shrink-0 w-64 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-2 p-2.5">
+                                <div class="relative h-28 rounded-xl overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover" alt="Fresh Greens">
+                                    <span class="absolute top-2 left-2 bg-emerald-600/90 backdrop-blur-md text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                                        Based on Fridge Stock
+                                    </span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-xs leading-snug line-clamp-2">
+                                        3 Ways to Keep Green Veggies Fresh for a Week
+                                    </h4>
+                                    <div class="flex items-center justify-between text-[9px] text-slate-400 mt-1.5">
+                                        <span><i class="fa-regular fa-clock mr-1"></i> 1 min read</span>
+                                        <span class="text-emerald-600 font-bold">Kitchen Hack</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Based on Nutrition Target -->
+                            <div class="flex-shrink-0 w-64 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-2 p-2.5">
+                                <div class="relative h-28 rounded-xl overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover" alt="Plant Protein">
+                                    <span class="absolute top-2 left-2 bg-teal-600/90 backdrop-blur-md text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                                        Based on Nutrition Target
+                                    </span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-xs leading-snug line-clamp-2">
+                                        Best Plant-Based Protein Sources for Body & Earth
+                                    </h4>
+                                    <div class="flex items-center justify-between text-[9px] text-slate-400 mt-1.5">
+                                        <span><i class="fa-regular fa-clock mr-1"></i> 2 min read</span>
+                                        <span class="text-teal-600 font-bold">Health Guide</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Zero Waste Habit -->
+                            <div class="flex-shrink-0 w-64 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-2 p-2.5">
+                                <div class="relative h-28 rounded-xl overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover" alt="Meal Prep">
+                                    <span class="absolute top-2 left-2 bg-amber-500/90 backdrop-blur-md text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                                        Eco Habit
+                                    </span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-xs leading-snug line-clamp-2">
+                                        Smart Meal Prep Hacks to Reduce Household Food Waste
+                                    </h4>
+                                    <div class="flex items-center justify-between text-[9px] text-slate-400 mt-1.5">
+                                        <span><i class="fa-regular fa-clock mr-1"></i> 2 min read</span>
+                                        <span class="text-amber-600 font-bold">Zero Waste</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- PAGE 2: FRIDGE MANAGEMENT -->
+                <section id="page-fridge" class="p-4 space-y-4 hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800">My Fridge Stock 🧊</h2>
+                            <p class="text-xs text-emerald-600 font-semibold">Track inventory & cook creatively</p>
+                        </div>
+                        <button onclick="openModal('modal-add-fridge')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow flex items-center space-x-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                            <span>Add Item</span>
+                        </button>
+                    </div>
+
+                    <!-- Search Filter Box -->
+                    <div class="relative">
+                        <input id="fridge-search-input" oninput="renderFridgeItems()" type="text" placeholder="Search item in fridge..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-emerald-500 outline-none">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    </div>
+
+                    <!-- Category Tabs -->
+                    <div class="flex space-x-1.5 bg-slate-200 p-1 rounded-xl text-xs font-semibold">
+                        <button id="tab-fridge-active" onclick="filterFridge('active')" class="flex-1 bg-white text-emerald-700 py-1.5 rounded-lg shadow-sm text-center">In Stock (<span id="count-active">0</span>)</button>
+                        <button id="tab-fridge-consumed" onclick="filterFridge('consumed')" class="flex-1 text-slate-600 py-1.5 rounded-lg text-center">Consumed (<span id="count-consumed">0</span>)</button>
+                        <button id="tab-fridge-wasted" onclick="filterFridge('wasted')" class="flex-1 text-slate-600 py-1.5 rounded-lg text-center">Wasted (<span id="count-wasted">0</span>)</button>
+                    </div>
+
+                    <!-- Clear History Button -->
+                    <div id="clear-history-container" class="hidden flex justify-end">
+                        <button onclick="clearFridgeHistory()" class="text-[10px] text-rose-600 hover:underline font-bold flex items-center space-x-1">
+                            <i class="fa-solid fa-eraser"></i>
+                            <span>Clear This History</span>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Item Container -->
+                    <div id="fridge-items-container" class="space-y-2.5">
+                        <!-- Rendered by renderFridgeItems() -->
+                    </div>
+
+                    <!-- Recipe CTA Card -->
+                    <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-2xl p-4 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] bg-white/20 px-2 py-0.5 rounded-full uppercase font-bold">Cook Inspiration</span>
+                            <i class="fa-solid fa-utensils text-emerald-200"></i>
+                        </div>
+                        <h4 class="font-bold text-xs">Wondering what to cook with your stock?</h4>
+                        <p class="text-[10px] text-emerald-100">Explore dozens of healthy recipes customized specifically to your fridge contents.</p>
+                        <button onclick="switchTab('journal')" class="w-full bg-amber-400 hover:bg-amber-500 text-emerald-950 text-xs font-bold py-2 rounded-xl shadow transition">
+                            Browse Creative Recipes
+                        </button>
+                    </div>
+                </section>
+
+                <!-- PAGE 3: MY PLATE JOURNAL -->
+                <section id="page-journal" class="p-4 space-y-4 hidden">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800">My Plate Journal 🥗</h2>
+                            <p class="text-xs text-slate-500">Daily nutrition logs & recipe ideas</p>
+                        </div>
+                        <button onclick="startAddMealFlow()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow flex items-center space-x-1">
+                            <i class="fa-solid fa-camera text-[10px]"></i>
+                            <span>Add Meal</span>
+                        </button>
+                    </div>
+
+                    <!-- Detailed Intake Card -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                        <h3 class="text-xs font-bold text-slate-800">Detailed Nutrition & Hydration</h3>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="text-slate-400 text-[10px] block">Total Calories</span>
+                                <span id="journal-calories-display" class="font-bold text-emerald-600 text-sm">1,240 <span class="text-[10px] font-normal text-slate-500">/ 1,800 kcal</span></span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex justify-between items-center">
+                                <div>
+                                    <span class="text-slate-400 text-[10px] block">Water Intake</span>
+                                    <span id="journal-water-display" class="font-bold text-blue-600 text-sm">1.8 <span class="text-[10px] font-normal text-slate-500">/ 2.5 L</span></span>
+                                </div>
+                                <div class="flex flex-col space-y-1">
+                                    <button onclick="updateWater(0.25)" class="w-6 h-6 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-xs hover:bg-blue-600 hover:text-white transition">+</button>
+                                    <button onclick="updateWater(-0.25)" class="w-6 h-6 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center font-bold text-xs hover:bg-slate-300 transition">-</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-[11px]">
+                            <div class="flex justify-between text-slate-600">
+                                <span>Dietary Fiber</span>
+                                <span class="font-bold text-slate-800">22g / 30g</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-teal-500 h-full w-[73%]"></div>
+                            </div>
+
+                            <div class="flex justify-between text-slate-600 pt-1">
+                                <span>Controlled Sugar</span>
+                                <span class="font-bold text-slate-800">18g / 40g (Safe)</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-emerald-500 h-full w-[45%]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meal Log History -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Today's Logged Meals</h3>
+                        <div id="meal-logs-container" class="space-y-2">
+                            <!-- Rendered by renderMealLogs() -->
+                        </div>
+                    </div>
+
+                    <!-- SEARCH BAR & CATEGORY PILLS -->
+                    <div class="pt-2 space-y-2.5">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider px-1">Explore Recipes & Cook Ideas</h3>
+                        
+                        <div class="relative">
+                            <input id="recipe-search-input" oninput="renderRecipes()" type="text" placeholder="Search recipes or ingredients..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-1 focus:ring-emerald-500 outline-none">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        </div>
+
+                        <!-- Horizontal Scrollable Category Pills -->
+                        <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs">
+                            <button onclick="filterRecipeCategory('All')" id="cat-pill-All" class="recipe-pill bg-emerald-600 text-white font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap shadow-sm">All</button>
+                            <button onclick="filterRecipeCategory('Breakfast')" id="cat-pill-Breakfast" class="recipe-pill bg-white text-slate-600 border border-slate-200 font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap">Breakfast</button>
+                            <button onclick="filterRecipeCategory('Lunch')" id="cat-pill-Lunch" class="recipe-pill bg-white text-slate-600 border border-slate-200 font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap">Lunch</button>
+                            <button onclick="filterRecipeCategory('Dinner')" id="cat-pill-Dinner" class="recipe-pill bg-white text-slate-600 border border-slate-200 font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap">Dinner</button>
+                            <button onclick="filterRecipeCategory('Snack')" id="cat-pill-Snack" class="recipe-pill bg-white text-slate-600 border border-slate-200 font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap">Snack</button>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 1: RECOMMENDED RECIPES -->
+                    <div id="section-recommended" class="space-y-2 pt-1">
+                        <div class="flex justify-between items-center px-1">
+                            <h4 class="text-xs font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i>
+                                Recommended Recipes
+                            </h4>
+                            <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">Personalized Target</span>
+                        </div>
+
+                        <div id="recommended-recipes-carousel" class="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
+                            <!-- Dynamically Rendered Recommended Recipe Horizontal Cards -->
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: ALL RECIPES -->
+                    <div class="space-y-2 pt-1">
+                        <h4 class="text-xs font-bold text-slate-800 px-1">All Recipes</h4>
+                        <div id="all-recipes-grid" class="grid grid-cols-2 gap-3">
+                            <!-- Dynamically Rendered All Recipe Vertical Cards -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAGE 4: AI ASSISTANT & KITCHEN QUIZ -->
+                <section id="page-ai-edu" class="p-4 space-y-4 hidden">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">Your Kitchen Assistant 🤖</h2>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Suggested Questions:</span>
+                        <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-1">
+                            <button onclick="useQuickPrompt('What can I cook with spinach, egg, and tofu?')" class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-semibold px-2.5 py-1 rounded-xl whitespace-nowrap hover:bg-emerald-100">
+                                🍳 Recipe for Spinach & Tofu?
+                            </button>
+                            <button onclick="useQuickPrompt('How to cook eggs healthily without extra fats?')" class="bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-semibold px-2.5 py-1 rounded-xl whitespace-nowrap hover:bg-teal-100">
+                                🥚 Healthy Egg Cooking?
+                            </button>
+                            <button onclick="useQuickPrompt('How long can raw tofu stay fresh in the fridge?')" class="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold px-2.5 py-1 rounded-xl whitespace-nowrap hover:bg-amber-100">
+                                🧊 Tofu Expiry Tips?
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[380px]">
+                        <div class="bg-slate-800 text-white p-3 flex items-center justify-between text-xs">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                                <span class="font-bold">NutriEco AI Assistant</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">Online</span>
+                        </div>
+
+                        <div id="chat-box" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
+                            <div class="bg-emerald-50 text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] border border-emerald-100">
+                                Hello! Got leftover ingredients in your fridge or need healthy cooking advice? Ask me anything or tap the quick prompts above! 😊
+                            </div>
+                        </div>
+
+                        <div class="p-2 border-t border-slate-100 flex space-x-2 bg-slate-50">
+                            <input id="chat-input" type="text" placeholder="Type your query..." class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-emerald-500 outline-none">
+                            <button onclick="sendChatMessage()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-container" class="bg-gradient-to-br from-emerald-700 to-teal-800 text-white p-4 rounded-2xl shadow-sm space-y-3">
+                        <div id="quiz-intro-card" class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] bg-amber-400 text-slate-900 font-extrabold px-2 py-0.5 rounded-full uppercase">Nutrition Quiz</span>
+                                <span class="text-[10px] text-emerald-200">5 Questions • Win Points</span>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-sm text-white">Start your quiz today! 🧠✨</h4>
+                                <p class="text-[11px] text-emerald-100 mt-1">Test your kitchen hacks & healthy eating knowledge to earn balance points.</p>
+                            </div>
+                            <button onclick="startQuiz()" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs font-extrabold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-play text-xs"></i>
+                                <span>Start Quiz Now</span>
+                            </button>
+                        </div>
+
+                        <div id="quiz-play-card" class="space-y-3 hidden">
+                            <div class="flex justify-between items-center">
+                                <span id="quiz-step-text" class="text-[10px] font-bold text-amber-300 uppercase">Question 1 of 5</span>
+                                <span class="text-[10px] text-emerald-200">+10 Points / answer</span>
+                            </div>
+
+                            <div id="quiz-progress-bars" class="flex space-x-1.5 w-full"></div>
+
+                            <h4 id="quiz-question" class="font-bold text-xs pt-1">Loading Question...</h4>
+
+                            <div id="quiz-options" class="space-y-2"></div>
+                        </div>
+
+                        <div id="quiz-result-card" class="space-y-3 hidden text-center py-2">
+                            <div class="w-12 h-12 bg-amber-400 text-slate-900 rounded-full flex items-center justify-center mx-auto text-xl font-bold shadow-lg">
+                                🏆
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">Quiz Completed!</h4>
+                                <p class="text-[11px] text-emerald-100 mt-0.5">You earned <span id="quiz-final-score" class="font-extrabold text-amber-300 text-xs">+50 Points</span> for your profile!</p>
+                            </div>
+                            <button onclick="resetQuiz()" class="w-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold py-2 rounded-xl transition border border-white/20">
+                                Take Quiz Again
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAGE 5: DASHBOARD -->
+                <section id="page-dashboard" class="p-4 space-y-4 hidden">
+                    <div class="flex items-center justify-between pt-1">
+                        <h2 class="text-base font-extrabold text-slate-800 tracking-tight">Balanced Life Index 📊</h2>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full border border-emerald-200">7-Day Report</span>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white p-5 rounded-3xl shadow-md space-y-4 overflow-hidden">
+                        <div class="flex justify-between items-center border-b border-slate-700/60 pb-3">
+                            <div>
+                                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Overall Index Score</span>
+                                <div class="flex items-baseline space-x-2 mt-1">
+                                    <span class="text-3xl font-black text-amber-400 leading-none" id="dash-overall-score">86</span>
+                                    <span class="text-xs text-slate-300">/ 100</span>
+                                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">Excellent</span>
+                                </div>
+                            </div>
+                            <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-400 flex-shrink-0">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/70 text-xs leading-relaxed">
+                            <p class="text-slate-200">
+                                <i class="fa-solid fa-circle-info text-amber-400 mr-1.5"></i>
+                                <b>Executive Summary:</b> High nutrition consistency paired with an impressive <b>89% kitchen efficiency rate</b>. Food waste reduced significantly this week!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h3 class="text-xs font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-heart-pulse text-emerald-600 mr-1.5"></i>
+                                Health & Nutrition Metrics
+                            </h3>
+                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Sub-score: 88/100</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100/60">
+                                <span class="text-slate-500 text-[10px] block">Avg. Daily Calories</span>
+                                <span class="font-bold text-slate-800">1,650 / 1,800 kcal</span>
+                                <div class="w-full bg-emerald-200/60 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                                    <div class="bg-emerald-600 h-full w-[91%]"></div>
+                                </div>
+                                <span class="text-[9px] text-emerald-700 mt-1 block">✓ 91% Target Met</span>
+                            </div>
+
+                            <div class="bg-blue-50/60 p-2.5 rounded-xl border border-blue-100/60">
+                                <span class="text-slate-500 text-[10px] block">Avg. Daily Hydration</span>
+                                <span class="font-bold text-slate-800">2.1 / 2.5 Liters</span>
+                                <div class="w-full bg-blue-200/60 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                                    <div class="bg-blue-600 h-full w-[84%]"></div>
+                                </div>
+                                <span class="text-[9px] text-blue-700 mt-1 block">✓ Optimal Range</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
+                            <div class="w-1/2 pr-2 space-y-1">
+                                <span class="text-[10px] font-bold text-slate-700 block">Nutrient Distribution</span>
+                                <p class="text-[9px] text-slate-500 leading-tight">Balanced ratio tailored to your Uric Acid friendly diet profile.</p>
+                                <div class="pt-1 text-[9px] space-y-0.5">
+                                    <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span><span class="text-slate-600">Carbs (50%)</span></div>
+                                    <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-teal-500 inline-block"></span><span class="text-slate-600">Protein (25%)</span></div>
+                                    <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span><span class="text-slate-600">Fats (15%)</span></div>
+                                    <div class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span><span class="text-slate-600">Fiber (10%)</span></div>
+                                </div>
+                            </div>
+                            <div class="w-1/2 h-28 relative flex items-center justify-center">
+                                <canvas id="macroDoughnutChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-[11px] pt-1">
+                            <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-shield-halved text-emerald-600 text-xs"></i>
+                                    <div>
+                                        <span class="font-bold text-slate-800 block">Dietary Profile Adherence</span>
+                                        <span class="text-[9px] text-slate-500" id="dash-diet-text">Uric Acid Friendly</span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">92% Match</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h3 class="text-xs font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-kitchen-set text-teal-600 mr-1.5"></i>
+                                Kitchen & Inventory Management
+                            </h3>
+                            <span class="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">Sub-score: 84/100</span>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-teal-50/70 p-2.5 rounded-xl border border-teal-100">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-bold">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-800 block">Kitchen Efficiency Rate</span>
+                                    <span class="text-[9px] text-slate-500">Ratio of consumed vs total inventory</span>
+                                </div>
+                            </div>
+                            <span id="dash-efficiency-rate" class="text-xs font-extrabold text-teal-700 bg-white px-2.5 py-1 rounded-lg border border-teal-200">89%</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100/60 space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-utensils text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[9px] block">Consumed Items</span>
+                                        <span id="dash-count-consumed" class="font-bold text-slate-800 text-xs">12 Items</span>
+                                    </div>
+                                </div>
+                                <div class="pt-1 flex flex-wrap gap-1" id="dash-consumed-categories"></div>
+                            </div>
+
+                            <div class="bg-rose-50/60 p-2.5 rounded-xl border border-rose-100/60 space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-7 h-7 rounded-lg bg-rose-500 text-white flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[9px] block">Wasted Items</span>
+                                        <span id="dash-count-wasted" class="font-bold text-slate-800 text-xs">1 Item</span>
+                                    </div>
+                                </div>
+                                <div class="pt-1 flex flex-wrap gap-1" id="dash-wasted-categories"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white p-3.5 rounded-2xl shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] bg-white/20 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">Zero-Waste Impact</span>
+                                <i class="fa-solid fa-leaf text-amber-300 text-sm"></i>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <div class="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20">
+                                    <div class="flex items-center space-x-1.5 text-amber-300">
+                                        <i class="fa-solid fa-piggy-bank text-xs"></i>
+                                        <span class="text-[9px] uppercase font-bold text-emerald-100">Money Saved</span>
+                                    </div>
+                                    <span id="dash-money-saved" class="text-base font-black text-white block mt-0.5">$28.20</span>
+                                    <span class="text-[8px] text-emerald-100">Estimated grocery savings</span>
+                                </div>
+
+                                <div class="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20">
+                                    <div class="flex items-center space-x-1.5 text-amber-300">
+                                        <i class="fa-solid fa-cloud-arrow-down text-xs"></i>
+                                        <span class="text-[9px] uppercase font-bold text-emerald-100">Carbon Saved</span>
+                                    </div>
+                                    <span id="dash-carbon-saved" class="text-base font-black text-white block mt-0.5">3.7 kg CO₂e</span>
+                                    <span class="text-[8px] text-emerald-100">Prevented emissions</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                        <h3 class="text-xs font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-list-check text-purple-600 mr-1.5"></i>
+                            Weekly Evaluation & Insights
+                        </h3>
+
+                        <div class="space-y-2 text-xs">
+                            <div class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-100/80 space-y-1">
+                                <div class="flex items-center text-emerald-800 font-bold text-[11px]">
+                                    <span class="mr-1.5">🟢</span> Wins & Highlights
+                                </div>
+                                <p class="text-slate-600 text-[10px] leading-relaxed" id="dash-win-text">
+                                    Outstanding effort! You successfully consumed <b>12 items</b> this week, generating <b>$28.20 in grocery savings</b> and keeping waste rate under 10%.
+                                </p>
+                            </div>
+
+                            <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-100/80 space-y-1">
+                                <div class="flex items-center text-amber-900 font-bold text-[11px]">
+                                    <span class="mr-1.5">🟡</span> Needs Focus
+                                </div>
+                                <p class="text-slate-600 text-[10px] leading-relaxed" id="dash-focus-text">
+                                    1 item from <b>Bakery</b> expired. Consider freeze-storing sliced bread or baking croutons before expiry.
+                                </p>
+                            </div>
+
+                            <button id="btn-generate-targets" onclick="generateNextWeekTargets()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2 mt-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                                <span>Generate Goals for Next Week</span>
+                            </button>
+
+                            <div id="next-week-targets-container" class="hidden p-3 bg-purple-50/90 rounded-xl border border-purple-200 space-y-2 transition-all">
+                                <div class="flex items-center justify-between text-purple-900 font-bold text-[11px]">
+                                    <span class="flex items-center"><i class="fa-solid fa-bullseye text-purple-600 mr-1.5"></i> Goals for Next Week</span>
+                                    <span class="text-[9px] bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full font-semibold">AI Generated</span>
+                                </div>
+                                <div class="space-y-1.5 text-[10px] text-slate-700 pt-1">
+                                    <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded-lg border border-purple-100 shadow-xs">
+                                        <input type="checkbox" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5">
+                                        <span>Keep kitchen waste rate strictly under 8%</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded-lg border border-purple-100 shadow-xs">
+                                        <input type="checkbox" checked class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5">
+                                        <span>Maintain 2.5L daily hydration target for 7 consecutive days</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded-lg border border-purple-100 shadow-xs">
+                                        <input type="checkbox" class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5">
+                                        <span>Try 2 new creative zero-waste leftover recipes from Journal</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 relative group cursor-pointer">
+                                <h3 class="text-xs font-bold text-slate-800 flex items-center">
+                                    <i class="fa-solid fa-chart-line text-blue-600 mr-1.5"></i>
+                                    7-Day Trend Analysis
+                                </h3>
+                                
+                                <div class="w-4 h-4 rounded-full bg-slate-100 text-slate-500 group-hover:text-emerald-700 group-hover:bg-emerald-100 border border-slate-200 flex items-center justify-center text-[9px] font-bold transition">
+                                    i
+                                </div>
+
+                                <div class="absolute left-0 top-6 hidden group-hover:block z-30 w-64 p-3 bg-slate-900/95 backdrop-blur-md text-white rounded-xl shadow-xl text-[10px] leading-relaxed border border-slate-700 pointer-events-none transition-all">
+                                    <div class="font-bold text-emerald-400 mb-1 flex items-center">
+                                        <i class="fa-solid fa-circle-info mr-1.5 text-xs"></i> Chart Dynamics Summary
+                                    </div>
+                                    <p class="text-slate-200">
+                                        Kitchen efficiency <i>(teal line)</i> spiked to <b>92% on Friday & Saturday</b> as 12 fridge items were utilized for healthy meals, pushing your Overall Index Score to 86/100.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span class="text-[9px] text-slate-400 font-medium flex items-center">
+                                Hover <span class="w-3.5 h-3.5 rounded-full bg-slate-100 border text-slate-500 flex items-center justify-center mx-1 font-bold text-[8px]">i</span> for insight
+                            </span>
+                        </div>
+
+                        <div class="h-44 relative">
+                            <canvas id="balanceChart"></canvas>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- PAGE 6: PROFILE PAGE -->
+                <section id="page-profile" class="p-4 space-y-4 hidden">
+                    <div class="flex items-center space-x-2 border-b pb-2">
+                        <button onclick="switchTab('home')" class="text-slate-500 hover:text-slate-800 text-sm">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-base font-bold text-slate-800">My Health & Dietary Profile</h2>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-3.5 my-auto">
+                        <div class="text-center space-y-1">
+                            <div class="w-16 h-16 rounded-full bg-amber-400 text-emerald-950 text-2xl font-black mx-auto flex items-center justify-center border-2 border-white shadow">
+                                <span id="profile-card-initial">A</span>
+                            </div>
+                            <h3 id="profile-card-display-name" class="font-bold text-slate-800 text-sm">Alex Johnson</h3>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">Active Member</span>
+                        </div>
+
+                        <div class="space-y-3 text-xs pt-2">
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">Full Name</label>
+                                <input id="prof-name" type="text" value="Alex Johnson" class="w-full border rounded-xl px-3 py-2 focus:ring-1 focus:ring-emerald-500 outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-slate-600 font-semibold mb-1">Age (Years)</label>
+                                    <input id="prof-age" type="number" value="28" class="w-full border rounded-xl px-3 py-2 focus:ring-1 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600 font-semibold mb-1">Dietary Condition</label>
+                                    <select id="prof-diet" class="w-full border rounded-xl px-3 py-2 focus:ring-1 focus:ring-emerald-500 outline-none">
+                                        <option value="General / Healthy">General / Healthy</option>
+                                        <option value="Uric Acid Friendly (Low Purine)">Uric Acid Friendly (Low Purine)</option>
+                                        <option value="Low Cholesterol">Low Cholesterol</option>
+                                        <option value="Diabetic Care (Low GI)">Diabetic Care (Low GI)</option>
+                                        <option value="Hypertension (Low Sodium)">Hypertension (Low Sodium)</option>
+                                        <option value="Vegetarian / Plant-Based">Vegetarian / Plant-Based</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">Allergies & Restrictions</label>
+                                <select id="prof-allergy" class="w-full border rounded-xl px-3 py-2 focus:ring-1 focus:ring-emerald-500 outline-none">
+                                    <option value="None">None</option>
+                                    <option value="Peanuts & Tree Nuts">Peanuts & Tree Nuts</option>
+                                    <option value="Seafood & Shellfish">Seafood & Shellfish</option>
+                                    <option value="Lactose & Dairy">Lactose & Dairy</option>
+                                    <option value="Gluten & Wheat">Gluten & Wheat</option>
+                                    <option value="Eggs">Eggs</option>
+                                </select>
+                            </div>
+
+                            <button onclick="saveProfileData()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition mt-2">
+                                Save Profile Changes
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <!-- RIGHT-SIDE NOTIFICATION DRAWER -->
+        <div id="notif-overlay" onclick="toggleNotificationDrawer(false)" class="absolute inset-0 bg-black/40 z-30 hidden"></div>
+        
+        <div id="notif-drawer" class="notif-drawer closed absolute top-0 right-0 bottom-0 w-full max-w-xs bg-white z-40 shadow-2xl flex flex-col p-4 border-l border-slate-200">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800 text-xs flex items-center">
+                    <i class="fa-solid fa-bell text-amber-500 mr-1.5"></i> Reminders
+                </h3>
+                <button onclick="toggleNotificationDrawer(false)" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar space-y-2.5 pt-3 text-[11px]">
+                <div class="p-2.5 bg-amber-50 rounded-xl border border-amber-100 space-y-1">
+                    <div class="flex items-center text-amber-800 font-bold">
+                        <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-500"></i> Expiry Alert
+                    </div>
+                    <p class="text-slate-600 leading-tight">Fresh Spinach expires soon. Plan a meal today!</p>
+                    <span class="text-[9px] text-slate-400 block">10 mins ago</span>
+                </div>
+
+                <div class="p-2.5 bg-blue-50 rounded-xl border border-blue-100 space-y-1">
+                    <div class="flex items-center text-blue-800 font-bold">
+                        <i class="fa-solid fa-droplet mr-1 text-blue-500"></i> Hydration
+                    </div>
+                    <p class="text-slate-600 leading-tight">Have you drank 2 glasses of water this afternoon?</p>
+                    <span class="text-[9px] text-slate-400 block">1 hour ago</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- GLOBAL NAVIGATION BAR -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-20 shadow-lg">
+            <div class="max-w-md mx-auto px-3 py-2 flex justify-around items-center">
+                <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-slate-400 active-tab">
+                    <i class="fa-solid fa-house text-base mb-0.5"></i>
+                    <span class="text-[9px]">Home</span>
+                </button>
+
+                <button onclick="switchTab('fridge')" id="nav-fridge" class="flex flex-col items-center text-slate-400">
+                    <i class="fa-solid fa-box-archive text-base mb-0.5"></i>
+                    <span class="text-[9px]">Fridge</span>
+                </button>
+
+                <button onclick="switchTab('journal')" id="nav-journal" class="flex flex-col items-center text-slate-400 relative">
+                    <div class="w-11 h-11 bg-emerald-600 text-white rounded-full flex items-center justify-center -mt-5 shadow-lg border-2 border-white hover:bg-emerald-700 transition">
+                        <i class="fa-solid fa-book-open text-base"></i>
+                    </div>
+                    <span class="text-[9px] mt-0.5">Journal</span>
+                </button>
+
+                <button onclick="switchTab('ai-edu')" id="nav-ai-edu" class="flex flex-col items-center text-slate-400">
+                    <i class="fa-solid fa-robot text-base mb-0.5"></i>
+                    <span class="text-[9px]">Assistant</span>
+                </button>
+
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-slate-400">
+                    <i class="fa-solid fa-heart-pulse text-base mb-0.5"></i>
+                    <span class="text-[9px]">Index</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- MODAL: LIVE INDEX BREAKDOWN DETAIL -->
+        <div id="modal-live-index-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-center justify-center p-4 hidden">
+            <div class="bg-white w-full max-w-xs rounded-3xl p-5 space-y-4 shadow-2xl border border-slate-100">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-black text-xs">
+                            86
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-xs">Live Index Score</h3>
+                            <p class="text-[9px] text-slate-400">Daily Balance Indicator</p>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('modal-live-index-detail')" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <!-- Metric 1: Nutrition Met -->
+                    <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 space-y-1">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-emerald-900 text-[11px]"><i class="fa-solid fa-bullseye text-emerald-600 mr-1"></i> Nutrition Goal Met</span>
+                            <span class="font-extrabold text-emerald-700 text-xs">90%</span>
+                        </div>
+                        <div class="w-full bg-emerald-200/60 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-emerald-600 h-full w-[90%]"></div>
+                        </div>
+                        <p class="text-[9px] text-slate-500 pt-0.5">Optimal calorie & protein target tracked today.</p>
+                    </div>
+
+                    <!-- Metric 2: Eco-Behavior -->
+                    <div class="bg-teal-50 p-3 rounded-2xl border border-teal-100 space-y-1">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-teal-900 text-[11px]"><i class="fa-solid fa-leaf text-teal-600 mr-1"></i> Eco-Behavior Score</span>
+                            <span class="font-extrabold text-teal-700 text-xs">82%</span>
+                        </div>
+                        <div class="w-full bg-teal-200/60 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-teal-600 h-full w-[82%]"></div>
+                        </div>
+                        <p class="text-[9px] text-slate-500 pt-0.5">High efficiency rate in using expiring fridge items.</p>
+                    </div>
+                </div>
+
+                <button onclick="closeModal('modal-live-index-detail'); switchTab('dashboard');" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs hover:bg-emerald-700 shadow-sm transition">
+                    View Detailed 7-Day Report
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL: ADD FRIDGE ITEM -->
+        <div id="modal-add-fridge" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-end justify-center hidden">
+            <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-slate-800 text-sm">Add New Fridge Item</h3>
+                    <button onclick="closeModal('modal-add-fridge')" class="text-slate-400">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+
+                <div class="flex space-x-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                    <button onclick="switchAddTab('manual')" id="add-tab-manual" class="flex-1 bg-white text-emerald-700 py-1.5 rounded-lg text-center shadow-sm">Manual</button>
+                    <button onclick="switchAddTab('voice')" id="add-tab-voice" class="flex-1 text-slate-600 py-1.5 rounded-lg text-center">Voice 🎙️</button>
+                    <button onclick="switchAddTab('photo')" id="add-tab-photo" class="flex-1 text-slate-600 py-1.5 rounded-lg text-center">Photo 📷</button>
+                </div>
+
+                <!-- Tab Manual -->
+                <div id="add-content-manual" class="space-y-2 text-xs">
+                    <div>
+                        <label class="block text-slate-600 font-semibold mb-1">Item Name</label>
+                        <input id="input-fridge-name" type="text" placeholder="e.g. Eggs, Fresh Spinach" class="w-full border rounded-xl px-3 py-2 outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Category</label>
+                            <select id="input-fridge-cat" class="w-full border rounded-xl px-3 py-2 outline-none">
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Proteins">Proteins</option>
+                                <option value="Dairy & Drinks">Dairy & Drinks</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Bakery">Bakery</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Days to Expiry</label>
+                            <input id="input-fridge-days" type="number" value="3" class="w-full border rounded-xl px-3 py-2 outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Quantity</label>
+                            <input id="input-fridge-qty" type="number" value="1" min="1" class="w-full border rounded-xl px-3 py-2 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Unit</label>
+                            <select id="input-fridge-unit" class="w-full border rounded-xl px-3 py-2 outline-none">
+                                <option value="pcs">pcs</option>
+                                <option value="pack">pack</option>
+                                <option value="kg">kg / gram</option>
+                                <option value="liter">liter / ml</option>
+                                <option value="ikat">ikat</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="addNewFridgeItemManual()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl shadow mt-2 hover:bg-emerald-700">
+                        Add to Stock
+                    </button>
+                </div>
+
+                <!-- Tab Voice -->
+                <div id="add-content-voice" class="space-y-3 text-xs text-center py-4 hidden">
+                    <div class="flex items-center justify-center space-x-1 py-2">
+                        <span class="w-1.5 h-6 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span class="w-1.5 h-10 bg-emerald-600 rounded-full animate-pulse delay-75"></span>
+                        <span class="w-1.5 h-14 bg-emerald-500 rounded-full animate-pulse delay-150"></span>
+                        <span class="w-1.5 h-8 bg-emerald-600 rounded-full animate-pulse delay-200"></span>
+                    </div>
+                    <button onclick="simulateVoiceRecord()" class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 text-2xl mx-auto flex items-center justify-center border-2 border-emerald-400 hover:bg-emerald-200 transition">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <p id="voice-status-text" class="text-slate-600 font-medium">Tap mic & speak (e.g. "Add 1 liter fresh milk")</p>
+                </div>
+
+                <!-- Tab Photo -->
+                <div id="add-content-photo" class="space-y-3 text-xs text-center py-4 hidden">
+                    <div onclick="simulatePhotoScan()" class="border-2 border-dashed border-emerald-400 bg-emerald-50/50 rounded-2xl p-6 hover:bg-emerald-100/50 cursor-pointer transition">
+                        <div class="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto mb-2 shadow">
+                            <i class="fa-solid fa-camera text-xl"></i>
+                        </div>
+                        <p class="text-slate-700 font-bold">Snap Grocery Receipt or Ingredients</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Point your camera at food items or shopping receipt</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAMERA FLOW MODALS FOR ADD MEAL JOURNAL -->
+        <!-- STEP 1: CAMERA MODAL (CAPTURE PHOTO) -->
+        <div id="modal-camera-capture" class="fixed inset-0 bg-slate-950 z-40 flex flex-col justify-between hidden">
+            <!-- Camera Top Bar -->
+            <div class="p-4 flex justify-between items-center text-white z-10 bg-gradient-to-b from-black/60 to-transparent">
+                <span class="text-xs font-bold tracking-wide flex items-center">
+                    <i class="fa-solid fa-camera text-emerald-400 mr-2"></i> Meal Camera Viewfinder
+                </span>
+                <button onclick="closeModal('modal-camera-capture')" class="text-slate-300 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Viewfinder Area -->
+            <div class="relative flex-1 bg-slate-900 flex items-center justify-center overflow-hidden">
+                <!-- Grid Lines -->
+                <div class="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none opacity-20 border border-white/20">
+                    <div class="border border-white/20"></div><div class="border border-white/20"></div><div class="border border-white/20"></div>
+                    <div class="border border-white/20"></div><div class="border border-white/20"></div><div class="border border-white/20"></div>
+                    <div class="border border-white/20"></div><div class="border border-white/20"></div><div class="border border-white/20"></div>
+                </div>
+
+                <!-- Live Camera View / Captured Image Preview Container -->
+                <div id="camera-live-view" class="text-center p-6 space-y-3">
+                    <div class="w-24 h-24 rounded-full bg-emerald-500/10 border-2 border-dashed border-emerald-400 flex items-center justify-center mx-auto text-emerald-400 text-3xl animate-pulse">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <p class="text-xs text-slate-300 font-medium">Center your meal dish inside the frame</p>
+                </div>
+
+                <img id="camera-captured-preview" class="hidden absolute inset-0 w-full h-full object-cover" alt="Captured Meal">
+            </div>
+
+            <!-- Camera Bottom Control Bar -->
+            <div class="p-6 bg-slate-900/90 text-white flex justify-around items-center z-10">
+                <div id="camera-shutter-controls" class="w-full flex justify-center">
+                    <button onclick="takeMealPhoto()" class="w-16 h-16 rounded-full border-4 border-white bg-emerald-500 flex items-center justify-center shadow-lg active:scale-95 transition">
+                        <i class="fa-solid fa-camera text-white text-xl"></i>
+                    </button>
+                </div>
+
+                <div id="camera-action-controls" class="hidden w-full flex justify-between items-center px-4 space-x-3">
+                    <button onclick="retakeMealPhoto()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-2xl border border-slate-700 text-xs transition flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-rotate-left text-amber-400"></i>
+                        <span>Retake</span>
+                    </button>
+                    <button onclick="useMealPhoto()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-2xl shadow-md text-xs transition flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Use Photo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: FORM INPUT DETAIL MODAL -->
+        <div id="modal-meal-details" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-end justify-center hidden">
+            <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5 max-h-[90%] overflow-y-auto no-scrollbar">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                        <i class="fa-solid fa-utensils text-teal-600 mr-1.5"></i> Meal Input Details
+                    </h3>
+                    <button onclick="closeModal('modal-meal-details')" class="text-slate-400">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+
+                <!-- Photo Preview Section -->
+                <div class="relative h-36 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
+                    <img id="form-photo-preview" src="" class="w-full h-full object-cover">
+                    <button onclick="startAddMealFlow()" class="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-xl border border-white/20">
+                        <i class="fa-solid fa-camera mr-1"></i> Change Photo
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block text-slate-600 font-semibold mb-1">Meal Name</label>
+                        <input id="input-flow-meal-name" type="text" placeholder="e.g. Fried Rice with Egg" value="Fried Rice with Egg" class="w-full border rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-teal-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-600 font-semibold mb-1">Ingredients</label>
+                        <textarea id="input-flow-meal-ingredients" rows="2" placeholder="e.g. Rice, egg, soy sauce, oil, garlic" class="w-full border rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-teal-500">Rice, egg, soy sauce, oil, garlic</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-600 font-semibold mb-1">Meal Time Category</label>
+                        <select id="input-flow-meal-time" class="w-full border rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-teal-500">
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch" selected>Lunch</option>
+                            <option value="Dinner">Dinner</option>
+                            <option value="Snack">Snack</option>
+                        </select>
+                    </div>
+
+                    <button onclick="submitMealForAiAnalysis()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-xl shadow mt-2 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                        <span>Save Meal & Analyze</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: AI LOADING SCREEN -->
+        <div id="modal-ai-loading" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden">
+            <div class="bg-white w-full max-w-xs rounded-3xl p-6 text-center space-y-4 shadow-2xl border border-slate-100">
+                <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping"></div>
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center text-2xl shadow-lg animate-bounce">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <h4 class="font-extrabold text-slate-800 text-sm">NutriEco AI Engine</h4>
+                    <p id="ai-loading-status-text" class="text-xs font-semibold text-emerald-600 h-6 flex items-center justify-center transition-all">
+                        Analyzing ingredients...
+                    </p>
+                </div>
+
+                <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="ai-loading-bar" class="bg-emerald-500 h-full w-[10%] transition-all duration-500"></div>
+                </div>
+
+                <p class="text-[10px] text-slate-400">Simulating deep nutritional & macronutrient assessment...</p>
+            </div>
+        </div>
+
+        <!-- MODAL: RECIPE DETAIL -->
+        <div id="modal-recipe-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-end justify-center hidden">
+            <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-3.5 max-h-[85%] overflow-y-auto no-scrollbar">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 id="recipe-modal-title" class="font-bold text-slate-800 text-sm">Recipe Detail</h3>
+                    <button onclick="closeModal('modal-recipe-detail')" class="text-slate-400">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+
+                <div id="recipe-modal-content" class="space-y-3 text-xs">
+                    <!-- Dynamic Recipe Detail rendered by openRecipeDetail() -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: INTERACTIVE STEP-BY-STEP COOKING MODE -->
+        <div id="modal-cooking-steps" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-40 p-4 flex flex-col justify-between hidden">
+            <div class="max-w-md mx-auto w-full bg-white rounded-3xl p-5 shadow-2xl flex-1 flex flex-col justify-between overflow-hidden my-auto max-h-[92%] border border-slate-100">
+                
+                <div class="space-y-3 border-b pb-3 flex-shrink-0">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h3 id="cooking-modal-title" class="font-bold text-slate-800 text-xs">Cooking Mode</h3>
+                        </div>
+                        <button onclick="closeModal('modal-cooking-steps')" class="text-slate-400 hover:text-slate-600">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500">
+                            <span id="cooking-step-badge">Step 1 of 3</span>
+                            <span id="cooking-progress-percent" class="text-emerald-600">33% Completed</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div id="cooking-progress-bar" class="bg-emerald-500 h-full w-[33%] transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="py-4 flex-1 flex flex-col justify-center space-y-4 text-xs overflow-y-auto no-scrollbar">
+                    <div class="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-100 space-y-2">
+                        <span class="text-[10px] uppercase tracking-wider font-extrabold text-emerald-700 block" id="step-card-number">Step 1 Instruction</span>
+                        <p id="cooking-step-instruction" class="text-slate-800 font-semibold text-sm leading-relaxed">
+                            Loading instruction...
+                        </p>
+                    </div>
+
+                    <div id="step-timer-widget" class="bg-slate-900 text-white p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center text-base font-bold">
+                                <i class="fa-solid fa-stopwatch"></i>
+                            </div>
+                            <div>
+                                <span class="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">Step Auto Timer</span>
+                                <span id="timer-display" class="font-mono text-base font-extrabold text-amber-300">00:00</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-1.5">
+                            <button id="btn-timer-toggle" onclick="toggleTimer()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition">
+                                <i class="fa-solid fa-play mr-1 text-[10px]"></i> Start
+                            </button>
+                            <button onclick="resetTimer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-xl font-bold text-xs border border-slate-700">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="flex items-center space-x-3 p-3 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-200/80 cursor-pointer transition">
+                        <input type="checkbox" id="step-interactive-checkbox" onchange="toggleStepComplete()" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+                        <span class="text-slate-700 font-medium text-xs">Mark this step as completed</span>
+                    </label>
+                </div>
+
+                <div class="flex space-x-2 border-t pt-3 flex-shrink-0">
+                    <button id="btn-prev-step" onclick="prevCookingStep()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-2xl transition text-xs flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                        <span>Previous</span>
+                    </button>
+
+                    <button id="btn-next-step" onclick="nextCookingStep()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-2xl shadow-sm transition text-xs flex items-center justify-center space-x-1">
+                        <span>Next Step</span>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+
+                    <button id="btn-finish-cook" onclick="finishCooking()" class="hidden flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-2.5 rounded-2xl shadow-sm transition text-xs flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-check text-[10px]"></i>
+                        <span>Finish & Add Meal</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DEFAULT STATE (WITH ENHANCED MEALS & RECIPES COLLECTION)
+        const DEFAULT_STATE = {
+            user: {
+                name: "Alex Johnson",
+                age: 28,
+                diet: "Uric Acid Friendly (Low Purine)",
+                allergy: "Peanuts & Tree Nuts"
+            },
+            nutrition: {
+                currentKcal: 1240,
+                targetKcal: 1800,
+                waterLiters: 1.8,
+                targetWater: 2.5
+            },
+            meals: [
+                { 
+                    id: 1, 
+                    name: "Oatmeal with Berries & Honey", 
+                    ingredients: "Rolled oats, milk, berries, honey", 
+                    kcal: 320, 
+                    protein: "8g", 
+                    carbs: "42g", 
+                    fat: "5g", 
+                    time: "Breakfast", 
+                    icon: "🥣", 
+                    photo: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=400&q=80" 
+                },
+                { 
+                    id: 2, 
+                    name: "Steamed Tofu & Spinach Soup", 
+                    ingredients: "White tofu, fresh spinach, garlic", 
+                    kcal: 280, 
+                    protein: "14g", 
+                    carbs: "18g", 
+                    fat: "6g", 
+                    time: "Lunch", 
+                    icon: "🍲", 
+                    photo: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80" 
+                }
+            ],
+            fridge: [
+                { id: 1, name: "Fresh Spinach", category: "Vegetables", daysLeft: 1, quantity: 1, unit: "ikat", timeframe: "1 Day Left", status: "active", icon: "🥬" },
+                { id: 2, name: "White Tofu", category: "Proteins", daysLeft: 2, quantity: 2, unit: "pcs", timeframe: "2 Days Left", status: "active", icon: "🧆" },
+                { id: 3, name: "Fresh Milk", category: "Dairy & Drinks", daysLeft: 5, quantity: 1, unit: "liter", timeframe: "5 Days Left", status: "active", icon: "🥛" },
+                { id: 4, name: "Tomato", category: "Vegetables", daysLeft: 0, quantity: 5, unit: "pcs", timeframe: "Finished", status: "consumed", icon: "🍅" },
+                { id: 5, name: "Chicken Breast", category: "Proteins", daysLeft: 0, quantity: 500, unit: "gram", timeframe: "Finished", status: "consumed", icon: "🍗" },
+                { id: 6, name: "Eggs (6 Pack)", category: "Proteins", daysLeft: 0, quantity: 1, unit: "pack", timeframe: "Finished", status: "consumed", icon: "🥚" },
+                { id: 7, name: "Carrots", category: "Vegetables", daysLeft: 0, quantity: 3, unit: "pcs", timeframe: "Finished", status: "consumed", icon: "🥕" },
+                { id: 8, name: "Salmon Fillet", category: "Proteins", daysLeft: 0, quantity: 2, unit: "pcs", timeframe: "Finished", status: "consumed", icon: "🐟" },
+                { id: 9, name: "Mushrooms", category: "Vegetables", daysLeft: 0, quantity: 1, unit: "pack", timeframe: "Finished", status: "consumed", icon: "🍄" },
+                { id: 10, name: "Greek Yogurt", category: "Dairy & Drinks", daysLeft: 0, quantity: 2, unit: "pcs", timeframe: "Finished", status: "consumed", icon: "🥣" },
+                { id: 11, name: "Broccoli", category: "Vegetables", daysLeft: 0, quantity: 1, unit: "kg", timeframe: "Finished", status: "consumed", icon: "🥦" },
+                { id: 12, name: "Oat Milk", category: "Dairy & Drinks", daysLeft: 0, quantity: 1, unit: "liter", timeframe: "Finished", status: "consumed", icon: "🧃" },
+                { id: 13, name: "Organic Apples", category: "Fruits", daysLeft: 0, quantity: 6, unit: "pcs", timeframe: "Finished", status: "consumed", icon: "🍎" },
+                { id: 14, name: "Bell Peppers", category: "Vegetables", daysLeft: 0, quantity: 2, unit: "pcs", timeframe: "Finished", status: "consumed", icon: "🫑" },
+                { id: 15, name: "Soy Protein", category: "Proteins", daysLeft: 0, quantity: 1, unit: "pack", timeframe: "Finished", status: "consumed", icon: "🫘" },
+                { id: 16, name: "Old Whole Wheat Bread", category: "Bakery", daysLeft: -1, quantity: 1, unit: "pack", timeframe: "Expired", status: "wasted", icon: "🍞" }
+            ],
+            recipes: [
+                {
+                    id: 1,
+                    title: "Fresh Spinach & Tofu Soup",
+                    category: "Lunch",
+                    isRecommended: true,
+                    kcal: 180,
+                    protein: "12g",
+                    carbs: "14g",
+                    fat: "4g",
+                    fiber: "6g",
+                    stockReadyText: "3/3 Ingredients Ready",
+                    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+                    ingredients: ["Fresh Spinach (In Stock)", "White Tofu (In Stock)", "Garlic & Pinch of Salt"],
+                    steps: [
+                        { desc: "Boil 500ml water in a pot, add sliced garlic and a pinch of salt.", timerSec: 180 },
+                        { desc: "Add diced white tofu and simmer warm over medium heat.", timerSec: 300 },
+                        { desc: "Add fresh spinach leaves, stir briefly for 1 minute then turn off heat to lock vitamins.", timerSec: 60 }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Steamed Veggie Salad",
+                    category: "Lunch",
+                    isRecommended: true,
+                    kcal: 310,
+                    protein: "10g",
+                    carbs: "28g",
+                    fat: "8g",
+                    fiber: "8g",
+                    stockReadyText: "2/4 Ingredients Ready",
+                    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80",
+                    ingredients: ["Steamed Carrots", "Broccoli", "Boiled Egg", "Low Sodium Peanut Dressing"],
+                    steps: [
+                        { desc: "Steam sliced carrots and broccoli until tender yet crisp.", timerSec: 300 },
+                        { desc: "Boil egg for 8 minutes, peel and cut into halves.", timerSec: 480 },
+                        { desc: "Drizzle with low-sodium peanut dressing and serve warm.", timerSec: 0 }
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "Berry Oatmeal Bowl",
+                    category: "Breakfast",
+                    isRecommended: true,
+                    kcal: 260,
+                    protein: "8g",
+                    carbs: "42g",
+                    fat: "5g",
+                    fiber: "7g",
+                    stockReadyText: "2/3 Ingredients Ready",
+                    image: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=400&q=80",
+                    ingredients: ["Rolled Oats", "Fresh Milk (In Stock)", "Mixed Berries & Honey"],
+                    steps: [
+                        { desc: "Cook rolled oats with fresh milk over medium heat until creamy.", timerSec: 240 },
+                        { desc: "Transfer to bowl, top with fresh berries and drizzle with honey.", timerSec: 0 }
+                    ]
+                },
+                {
+                    id: 4,
+                    title: "Grilled Herb Chicken",
+                    category: "Dinner",
+                    isRecommended: false,
+                    kcal: 420,
+                    protein: "38g",
+                    carbs: "8g",
+                    fat: "12g",
+                    fiber: "3g",
+                    stockReadyText: "1/3 Ingredients Ready",
+                    image: "https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?auto=format&fit=crop&w=400&q=80",
+                    ingredients: ["Chicken Breast", "Olive Oil & Italian Herbs", "Steamed Asparagus"],
+                    steps: [
+                        { desc: "Marinate chicken breast with herbs, salt, and olive oil.", timerSec: 600 },
+                        { desc: "Grill chicken breast over medium heat for 6-8 minutes each side.", timerSec: 420 },
+                        { desc: "Plate with steamed asparagus on the side.", timerSec: 0 }
+                    ]
+                },
+                {
+                    id: 5,
+                    title: "Fresh Banana Smoothie",
+                    category: "Snack",
+                    isRecommended: false,
+                    kcal: 190,
+                    protein: "6g",
+                    carbs: "34g",
+                    fat: "3g",
+                    fiber: "4g",
+                    stockReadyText: "2/2 Ingredients Ready",
+                    image: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=400&q=80",
+                    ingredients: ["Fresh Milk (In Stock)", "Ripe Bananas", "Chia Seeds"],
+                    steps: [
+                        { desc: "Blend fresh milk, banana slices, and chia seeds until velvety smooth.", timerSec: 60 },
+                        { desc: "Pour into a chilled glass and enjoy fresh.", timerSec: 0 }
+                    ]
+                }
+            ],
+            currentFridgeFilter: 'active',
+            currentRecipeCategory: 'All'
+        };
+
+        const SAMPLE_MEAL_PHOTOS = [
+            "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80"
+        ];
+
+        let capturedPhotoUrl = "";
+        let AppState = loadAppState();
+        let balanceChartInstance = null;
+        let macroChartInstance = null;
+
+        function loadAppState() {
+            const saved = localStorage.getItem('nutrieco_app_state');
+            const state = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_STATE));
+            if (!state.recipes) state.recipes = DEFAULT_STATE.recipes;
+            if (!state.meals) state.meals = DEFAULT_STATE.meals;
+            return state;
+        }
+
+        function saveAppState() {
+            localStorage.setItem('nutrieco_app_state', JSON.stringify(AppState));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserProfile();
+            renderFridgeItems();
+            renderMealLogs();
+            updateNutritionUI();
+            renderRecipes();
+        });
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function switchTab(pageId) {
+            const pages = ['home', 'fridge', 'journal', 'ai-edu', 'dashboard', 'profile'];
+            pages.forEach(p => {
+                const pageEl = document.getElementById(`page-${p}`);
+                if (pageEl) pageEl.classList.add('hidden');
+
+                const navEl = document.getElementById(`nav-${p}`);
+                if (navEl) {
+                    navEl.classList.remove('active-tab');
+                    navEl.classList.add('text-slate-400');
+                }
+            });
+
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            const targetNav = document.getElementById(`nav-${pageId}`);
+            if (targetNav) {
+                targetNav.classList.add('active-tab');
+                targetNav.classList.remove('text-slate-400');
+            }
+
+            document.getElementById('app-content').scrollTop = 0;
+
+            if (pageId === 'dashboard') {
+                updateDashboardStats();
+            }
+        }
+
+        function renderUserProfile() {
+            const firstName = AppState.user.name.split(' ')[0] || 'User';
+            document.getElementById('home-greeting-name').innerText = `Hello, ${firstName}! 👋`;
+            document.getElementById('header-avatar-initial').innerText = firstName.charAt(0);
+            document.getElementById('profile-card-initial').innerText = firstName.charAt(0);
+            document.getElementById('profile-card-display-name').innerText = AppState.user.name;
+            
+            document.getElementById('prof-name').value = AppState.user.name;
+            document.getElementById('prof-age').value = AppState.user.age;
+            document.getElementById('prof-diet').value = AppState.user.diet;
+            document.getElementById('prof-allergy').value = AppState.user.allergy;
+            document.getElementById('dash-diet-text').innerText = AppState.user.diet;
+        }
+
+        function saveProfileData() {
+            AppState.user.name = document.getElementById('prof-name').value;
+            AppState.user.age = document.getElementById('prof-age').value;
+            AppState.user.diet = document.getElementById('prof-diet').value;
+            AppState.user.allergy = document.getElementById('prof-allergy').value;
+
+            saveAppState();
+            renderUserProfile();
+            alert('Profile changes saved successfully!');
+            switchTab('home');
+        }
+
+        function updateNutritionUI() {
+            const kcal = AppState.nutrition.currentKcal;
+            const targetKcal = AppState.nutrition.targetKcal;
+            const pct = Math.min(100, Math.round((kcal / targetKcal) * 100));
+
+            document.getElementById('home-calories-text').innerText = `${kcal.toLocaleString()} / ${targetKcal.toLocaleString()} kcal`;
+            document.getElementById('home-calories-bar').style.width = `${pct}%`;
+
+            const homeWaterEl = document.getElementById('home-water-display');
+            if (homeWaterEl) homeWaterEl.innerText = AppState.nutrition.waterLiters.toFixed(1);
+
+            document.getElementById('journal-calories-display').innerHTML = `${kcal.toLocaleString()} <span class="text-[10px] font-normal text-slate-500">/ ${targetKcal.toLocaleString()} kcal</span>`;
+            document.getElementById('journal-water-display').innerHTML = `${AppState.nutrition.waterLiters.toFixed(1)} <span class="text-[10px] font-normal text-slate-500">/ ${AppState.nutrition.targetWater} L</span>`;
+        }
+
+        function updateWater(amount) {
+            AppState.nutrition.waterLiters = Math.max(0, parseFloat((AppState.nutrition.waterLiters + amount).toFixed(2)));
+            saveAppState();
+            updateNutritionUI();
+        }
+
+        function toggleNotificationDrawer(show) {
+            const drawer = document.getElementById('notif-drawer');
+            const overlay = document.getElementById('notif-overlay');
+            if (show) {
+                overlay.classList.remove('hidden');
+                drawer.classList.remove('closed');
+                drawer.classList.add('open');
+            } else {
+                overlay.classList.add('hidden');
+                drawer.classList.remove('open');
+                drawer.classList.add('closed');
+            }
+        }
+
+        function renderFridgeItems() {
+            const container = document.getElementById('fridge-items-container');
+            const searchVal = (document.getElementById('fridge-search-input')?.value || '').toLowerCase();
+            container.innerHTML = '';
+
+            let filtered = AppState.fridge.filter(item => item.status === AppState.currentFridgeFilter);
+            if (searchVal) {
+                filtered = filtered.filter(item => item.name.toLowerCase().includes(searchVal) || item.category.toLowerCase().includes(searchVal));
+            }
+
+            document.getElementById('count-active').innerText = AppState.fridge.filter(i => i.status === 'active').length;
+            document.getElementById('count-consumed').innerText = AppState.fridge.filter(i => i.status === 'consumed').length;
+            document.getElementById('count-wasted').innerText = AppState.fridge.filter(i => i.status === 'wasted').length;
+
+            const clearBtnContainer = document.getElementById('clear-history-container');
+            if (AppState.currentFridgeFilter !== 'active') {
+                clearBtnContainer.classList.remove('hidden');
+            } else {
+                clearBtnContainer.classList.add('hidden');
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">No items in this section</div>`;
+            } else {
+                filtered.forEach(item => {
+                    let statusBadge = '';
+                    if (item.status === 'active') {
+                        statusBadge = `<p class="text-[10px] ${item.daysLeft <= 1 ? 'text-rose-500 font-bold' : 'text-emerald-600 font-semibold'}">Expires in: ${item.timeframe || (item.daysLeft <= 0 ? 'Today' : item.daysLeft + ' days')}</p>`;
+                    } else if (item.status === 'consumed') {
+                        statusBadge = `<p class="text-[10px] text-emerald-600 font-semibold">✓ Consumed</p>`;
+                    } else {
+                        statusBadge = `<p class="text-[10px] text-rose-500 font-semibold">✗ Wasted</p>`;
+                    }
+
+                    let actions = '';
+                    if (item.status === 'active') {
+                        actions = `
+                            <div class="flex space-x-1">
+                                <button onclick="updateItemStatus(${item.id}, 'consumed')" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white px-2 py-1.5 rounded-lg text-[10px] font-bold transition">
+                                    <i class="fa-solid fa-check mr-0.5"></i> Eat
+                                </button>
+                                <button onclick="updateItemStatus(${item.id}, 'wasted')" class="bg-rose-100 text-rose-700 hover:bg-rose-600 hover:text-white px-2 py-1.5 rounded-lg text-[10px] font-bold transition">
+                                    <i class="fa-solid fa-trash mr-0.5"></i> Toss
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        actions = `
+                            <button onclick="deleteFridgeItem(${item.id})" class="text-slate-300 hover:text-rose-500 p-1.5 text-xs transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        `;
+                    }
+
+                    const qtyDisplay = item.quantity ? `<span class="bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1.5">${item.quantity} ${item.unit || ''}</span>` : '';
+
+                    container.innerHTML += `
+                        <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">${item.icon}</span>
+                                <div>
+                                    <div class="flex items-center">
+                                        ${qtyDisplay}
+                                        <h4 class="font-bold text-slate-800 text-xs">${item.name}</h4>
+                                    </div>
+                                    ${statusBadge}
+                                    <span class="text-[9px] text-slate-400">Category: ${item.category}</span>
+                                </div>
+                            </div>
+                            ${actions}
+                        </div>
+                    `;
+                });
+            }
+
+            renderHomeExpiringList();
+        }
+
+        function updateItemStatus(id, newStatus) {
+            const item = AppState.fridge.find(i => i.id === id);
+            if (item) {
+                item.status = newStatus;
+                saveAppState();
+                renderFridgeItems();
+            }
+        }
+
+        function deleteFridgeItem(id) {
+            AppState.fridge = AppState.fridge.filter(i => i.id !== id);
+            saveAppState();
+            renderFridgeItems();
+        }
+
+        function clearFridgeHistory() {
+            if (confirm(`Clear all ${AppState.currentFridgeFilter} items?`)) {
+                AppState.fridge = AppState.fridge.filter(i => i.status !== AppState.currentFridgeFilter);
+                saveAppState();
+                renderFridgeItems();
+            }
+        }
+
+        function renderHomeExpiringList() {
+            const homeList = document.getElementById('home-expiring-list');
+            const expiring = AppState.fridge.filter(i => i.status === 'active' && i.daysLeft <= 2);
+            
+            document.getElementById('expiring-badge').innerText = `${expiring.length} Items`;
+            homeList.innerHTML = '';
+
+            if (expiring.length === 0) {
+                homeList.innerHTML = `<p class="col-span-2 text-slate-400 text-[10px] text-center">No urgent expiring items!</p>`;
+            } else {
+                expiring.forEach(i => {
+                    homeList.innerHTML += `
+                        <div class="bg-white p-2 rounded-xl border border-rose-100 flex items-center space-x-2">
+                            <span>${i.icon}</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-[11px]">${i.name}</h4>
+                                <p class="text-[9px] text-rose-500 font-semibold">${i.daysLeft <= 0 ? 'Expires Today' : i.daysLeft + ' Days Left'}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function filterFridge(status) {
+            AppState.currentFridgeFilter = status;
+            ['active', 'consumed', 'wasted'].forEach(s => {
+                const btn = document.getElementById(`tab-fridge-${s}`);
+                if (s === status) {
+                    btn.classList.add('bg-white', 'text-emerald-700', 'shadow-sm');
+                    btn.classList.remove('text-slate-600');
+                } else {
+                    btn.classList.remove('bg-white', 'text-emerald-700', 'shadow-sm');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+            renderFridgeItems();
+        }
+
+        function addNewFridgeItemManual() {
+            const name = document.getElementById('input-fridge-name').value.trim();
+            const category = document.getElementById('input-fridge-cat').value;
+            const daysLeft = parseInt(document.getElementById('input-fridge-days').value) || 3;
+            const quantity = parseFloat(document.getElementById('input-fridge-qty')?.value) || 1;
+            const unit = document.getElementById('input-fridge-unit')?.value || 'pcs';
+
+            if (!name) return alert('Please enter item name!');
+
+            let icon = "🥗";
+            if (category === 'Proteins') icon = "🥚";
+            if (category === 'Dairy & Drinks') icon = "🧃";
+            if (category === 'Fruits') icon = "🍎";
+            if (category === 'Bakery') icon = "🍞";
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                category,
+                daysLeft,
+                quantity,
+                unit,
+                timeframe: `${daysLeft} Days Left`,
+                status: 'active',
+                icon
+            };
+
+            AppState.fridge.unshift(newItem);
+            saveAppState();
+
+            document.getElementById('input-fridge-name').value = '';
+            closeModal('modal-add-fridge');
+            renderFridgeItems();
+        }
+
+        function startAddMealFlow() {
+            capturedPhotoUrl = "";
+            document.getElementById('camera-live-view').classList.remove('hidden');
+            document.getElementById('camera-captured-preview').classList.add('hidden');
+            document.getElementById('camera-shutter-controls').classList.remove('hidden');
+            document.getElementById('camera-action-controls').classList.add('hidden');
+            
+            openModal('modal-camera-capture');
+        }
+
+        function takeMealPhoto() {
+            const randomIndex = Math.floor(Math.random() * SAMPLE_MEAL_PHOTOS.length);
+            capturedPhotoUrl = SAMPLE_MEAL_PHOTOS[randomIndex];
+
+            const imgPreview = document.getElementById('camera-captured-preview');
+            imgPreview.src = capturedPhotoUrl;
+            imgPreview.classList.remove('hidden');
+            document.getElementById('camera-live-view').classList.add('hidden');
+
+            document.getElementById('camera-shutter-controls').classList.add('hidden');
+            document.getElementById('camera-action-controls').classList.remove('hidden');
+        }
+
+        function retakeMealPhoto() {
+            capturedPhotoUrl = "";
+            document.getElementById('camera-live-view').classList.remove('hidden');
+            document.getElementById('camera-captured-preview').classList.add('hidden');
+            document.getElementById('camera-shutter-controls').classList.remove('hidden');
+            document.getElementById('camera-action-controls').classList.add('hidden');
+        }
+
+        function useMealPhoto() {
+            closeModal('modal-camera-capture');
+            document.getElementById('form-photo-preview').src = capturedPhotoUrl || SAMPLE_MEAL_PHOTOS[0];
+            openModal('modal-meal-details');
+        }
+
+        function submitMealForAiAnalysis() {
+            const mealName = document.getElementById('input-flow-meal-name').value.trim();
+            const ingredients = document.getElementById('input-flow-meal-ingredients').value.trim();
+            const mealTime = document.getElementById('input-flow-meal-time').value;
+
+            if (!mealName) return alert('Please enter meal name!');
+
+            closeModal('modal-meal-details');
+            openModal('modal-ai-loading');
+
+            const statusEl = document.getElementById('ai-loading-status-text');
+            const progressEl = document.getElementById('ai-loading-bar');
+
+            statusEl.innerText = "Analyzing ingredients...";
+            progressEl.style.width = "30%";
+
+            setTimeout(() => {
+                statusEl.innerText = "Counting proteins, carbs & fats...";
+                progressEl.style.width = "65%";
+            }, 1500);
+
+            setTimeout(() => {
+                statusEl.innerText = "Calculating total calories...";
+                progressEl.style.width = "90%";
+            }, 3000);
+
+            setTimeout(() => {
+                progressEl.style.width = "100%";
+                
+                const generatedKcal = Math.floor(Math.random() * 200) + 320;
+                const generatedProtein = Math.floor(Math.random() * 15) + 12;
+                const generatedCarbs = Math.floor(Math.random() * 30) + 25;
+                const generatedFat = Math.floor(Math.random() * 10) + 6;
+
+                const newMealEntry = {
+                    id: Date.now(),
+                    name: mealName,
+                    ingredients: ingredients || "Various ingredients",
+                    kcal: generatedKcal,
+                    protein: `${generatedProtein}g`,
+                    carbs: `${generatedCarbs}g`,
+                    fat: `${generatedFat}g`,
+                    time: mealTime,
+                    icon: mealTime === 'Breakfast' ? '🥣' : (mealTime === 'Lunch' ? '🍱' : (mealTime === 'Dinner' ? '🍲' : '🍎')),
+                    photo: capturedPhotoUrl || SAMPLE_MEAL_PHOTOS[0]
+                };
+
+                if (!AppState.meals) AppState.meals = [];
+                AppState.meals.unshift(newMealEntry);
+                AppState.nutrition.currentKcal += generatedKcal;
+
+                saveAppState();
+                closeModal('modal-ai-loading');
+
+                renderMealLogs();
+                updateNutritionUI();
+                switchTab('journal');
+            }, 4500);
+        }
+
+        function renderMealLogs() {
+            const container = document.getElementById('meal-logs-container');
+            container.innerHTML = '';
+
+            if (!AppState.meals || AppState.meals.length === 0) {
+                container.innerHTML = `<p class="text-center py-4 text-slate-400 text-xs">No meal added today yet.</p>`;
+                return;
+            }
+
+            AppState.meals.forEach(m => {
+                const photoHtml = m.photo 
+                    ? `<img src="${m.photo}" class="w-12 h-12 rounded-xl object-cover border border-slate-100 flex-shrink-0">`
+                    : `<span class="text-xl">${m.icon || '🍽️'}</span>`;
+
+                const ingredientsText = m.ingredients 
+                    ? `<p class="text-[9px] text-slate-400 truncate max-w-[180px]">${m.ingredients}</p>` 
+                    : '';
+
+                container.innerHTML += `
+                    <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center space-x-2">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            ${photoHtml}
+                            <div class="overflow-hidden">
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-[9px] font-extrabold bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full uppercase">${m.time}</span>
+                                    <h4 class="font-bold text-slate-800 text-xs truncate">${m.name}</h4>
+                                </div>
+                                ${ingredientsText}
+                                <div class="flex items-center space-x-1.5 mt-1">
+                                    <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">🔥 ${m.kcal} kcal</span>
+                                    ${m.protein ? `<span class="text-[9px] font-semibold text-slate-600">🥩 ${m.protein}</span>` : ''}
+                                    ${m.carbs ? `<span class="text-[9px] font-semibold text-slate-600">🌾 ${m.carbs}</span>` : ''}
+                                    ${m.fat ? `<span class="text-[9px] font-semibold text-slate-600">🥑 ${m.fat}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="deleteMealLog(${m.id})" class="text-slate-300 hover:text-rose-500 p-1 text-xs flex-shrink-0">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteMealLog(id) {
+            const target = AppState.meals.find(m => m.id === id);
+            if (target) {
+                AppState.nutrition.currentKcal = Math.max(0, AppState.nutrition.currentKcal - target.kcal);
+                AppState.meals = AppState.meals.filter(m => m.id !== id);
+                saveAppState();
+                renderMealLogs();
+                updateNutritionUI();
+            }
+        }
+
+        function filterRecipeCategory(cat) {
+            AppState.currentRecipeCategory = cat;
+            const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
+            categories.forEach(c => {
+                const btn = document.getElementById(`cat-pill-${c}`);
+                if (btn) {
+                    if (c === cat) {
+                        btn.className = "recipe-pill bg-emerald-600 text-white font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap shadow-sm";
+                    } else {
+                        btn.className = "recipe-pill bg-white text-slate-600 border border-slate-200 font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap";
+                    }
+                }
+            });
+            renderRecipes();
+        }
+
+        function renderRecipes() {
+            const searchVal = (document.getElementById('recipe-search-input')?.value || '').toLowerCase();
+            const selectedCat = AppState.currentRecipeCategory || 'All';
+
+            let list = AppState.recipes || [];
+
+            if (selectedCat !== 'All') {
+                list = list.filter(r => r.category === selectedCat);
+            }
+
+            if (searchVal) {
+                list = list.filter(r => 
+                    r.title.toLowerCase().includes(searchVal) || 
+                    r.ingredients.some(i => i.toLowerCase().includes(searchVal))
+                );
+            }
+
+            const carousel = document.getElementById('recommended-recipes-carousel');
+            const recommendedList = list.filter(r => r.isRecommended);
+            carousel.innerHTML = '';
+
+            if (recommendedList.length === 0) {
+                carousel.innerHTML = `<div class="text-slate-400 text-xs py-4 px-2 italic">No recommended recipes match query</div>`;
+            } else {
+                recommendedList.forEach(r => {
+                    carousel.innerHTML += `
+                        <div onclick="openRecipeDetail(${r.id})" class="flex-shrink-0 w-60 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer hover:border-emerald-300 transition">
+                            <div class="relative h-28 w-full">
+                                <img src="${r.image}" alt="${r.title}" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 bg-emerald-600/90 backdrop-blur-md text-white font-extrabold text-[9px] px-2 py-0.5 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-box-open mr-0.5 text-amber-300"></i> ${r.stockReadyText}
+                                </span>
+                            </div>
+                            <div class="p-3">
+                                <h4 class="font-bold text-slate-800 text-xs truncate">${r.title}</h4>
+                                <div class="flex items-center space-x-1 mt-1.5">
+                                    <span class="bg-slate-100 text-slate-700 text-[9px] font-semibold px-1.5 py-0.5 rounded">🔥 ${r.kcal} kcal</span>
+                                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-semibold px-1.5 py-0.5 rounded">🥩 ${r.protein}</span>
+                                    <span class="bg-amber-50 text-amber-700 text-[9px] font-semibold px-1.5 py-0.5 rounded">🌾 ${r.carbs}</span>
+                                </div>
+                                <button class="w-full mt-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-1.5 rounded-xl text-[10px] transition flex items-center justify-center space-x-1">
+                                    <span>Start Cooking</span>
+                                    <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const grid = document.getElementById('all-recipes-grid');
+            grid.innerHTML = '';
+
+            if (list.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-slate-400 text-xs py-8 text-center italic">No recipes found matching your filter</div>`;
+            } else {
+                list.forEach(r => {
+                    grid.innerHTML += `
+                        <div onclick="openRecipeDetail(${r.id})" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer hover:border-emerald-300 transition flex flex-col justify-between">
+                            <div>
+                                <div class="relative h-24 w-full">
+                                    <img src="${r.image}" alt="${r.title}" class="w-full h-full object-cover">
+                                    <span class="absolute top-1.5 left-1.5 bg-emerald-600/90 backdrop-blur-md text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full shadow-xs">
+                                        ${r.stockReadyText}
+                                    </span>
+                                </div>
+                                <div class="p-2.5">
+                                    <h4 class="font-bold text-slate-800 text-xs truncate">${r.title}</h4>
+                                    <p class="text-[9px] text-slate-400 mt-0.5">${r.category} • ${r.kcal} kcal</p>
+                                </div>
+                            </div>
+                            <div class="p-2.5 pt-0">
+                                <button class="w-full bg-slate-50 hover:bg-emerald-50 text-emerald-700 font-bold py-1.5 rounded-xl text-[10px] border border-slate-100 transition">
+                                    View Recipe
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function openRecipeDetail(id) {
+            const r = AppState.recipes.find(item => item.id === id) || AppState.recipes[0];
+            document.getElementById('recipe-modal-title').innerText = r.title;
+            
+            const content = document.getElementById('recipe-modal-content');
+            content.innerHTML = `
+                <div class="relative h-36 rounded-2xl overflow-hidden border">
+                    <img src="${r.image}" class="w-full h-full object-cover">
+                    <span class="absolute bottom-2 left-2 bg-slate-900/80 text-white font-bold text-[9px] px-2 py-0.5 rounded-full">
+                        🔥 ${r.kcal} kcal | 🥩 ${r.protein}
+                    </span>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1">Required Ingredients:</h4>
+                    <ul class="list-disc list-inside text-slate-600 space-y-0.5 text-[11px]">
+                        ${r.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                    </ul>
+                </div>
+                <button onclick="startCookingSteps(${r.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition">
+                    Start Step-by-Step Cooking
+                </button>
+            `;
+
+            openModal('modal-recipe-detail');
+        }
+
+        let currentCookingRecipe = null;
+        let currentStepIndex = 0;
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isTimerRunning = false;
+
+        function startCookingSteps(recipeId) {
+            currentCookingRecipe = AppState.recipes.find(r => r.id === recipeId) || AppState.recipes[0];
+            currentStepIndex = 0;
+            closeModal('modal-recipe-detail');
+            openModal('modal-cooking-steps');
+            renderCookingStep();
+        }
+
+        function renderCookingStep() {
+            if (!currentCookingRecipe) return;
+
+            const totalSteps = currentCookingRecipe.steps.length;
+            const step = currentCookingRecipe.steps[currentStepIndex];
+            const pct = Math.round(((currentStepIndex + 1) / totalSteps) * 100);
+
+            document.getElementById('cooking-modal-title').innerText = currentCookingRecipe.title;
+            document.getElementById('cooking-step-badge').innerText = `Step ${currentStepIndex + 1} of ${totalSteps}`;
+            document.getElementById('cooking-progress-percent').innerText = `${pct}% Completed`;
+            document.getElementById('cooking-progress-bar').style.width = `${pct}%`;
+
+            document.getElementById('step-card-number').innerText = `Step ${currentStepIndex + 1} Instruction`;
+            document.getElementById('cooking-step-instruction').innerText = step.desc;
+
+            document.getElementById('btn-prev-step').disabled = currentStepIndex === 0;
+
+            if (currentStepIndex === totalSteps - 1) {
+                document.getElementById('btn-next-step').classList.add('hidden');
+                document.getElementById('btn-finish-cook').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-next-step').classList.remove('hidden');
+                document.getElementById('btn-finish-cook').classList.add('hidden');
+            }
+
+            resetTimer();
+            timerSeconds = step.timerSec || 0;
+            updateTimerDisplay();
+
+            document.getElementById('step-interactive-checkbox').checked = false;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('btn-timer-toggle');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.innerHTML = `<i class="fa-solid fa-play mr-1 text-[10px]"></i> Start`;
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition";
+            } else {
+                if (timerSeconds <= 0) return;
+                isTimerRunning = true;
+                btn.innerHTML = `<i class="fa-solid fa-pause mr-1 text-[10px]"></i> Pause`;
+                btn.className = "bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition";
+
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    updateTimerDisplay();
+                    if (timerSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        btn.innerHTML = `<i class="fa-solid fa-play mr-1 text-[10px]"></i> Start`;
+                        btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition";
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            const btn = document.getElementById('btn-timer-toggle');
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-play mr-1 text-[10px]"></i> Start`;
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition";
+            }
+            if (currentCookingRecipe && currentCookingRecipe.steps[currentStepIndex]) {
+                timerSeconds = currentCookingRecipe.steps[currentStepIndex].timerSec || 0;
+            } else {
+                timerSeconds = 0;
+            }
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timer-display').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function toggleStepComplete() {
+            // Optional callback logic for completed checkbox
+        }
+
+        function nextCookingStep() {
+            if (currentCookingRecipe && currentStepIndex < currentCookingRecipe.steps.length - 1) {
+                currentStepIndex++;
+                renderCookingStep();
+            }
+        }
+
+        function prevCookingStep() {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderCookingStep();
+            }
+        }
+
+        function finishCooking() {
+            if (currentCookingRecipe) {
+                const mealEntry = {
+                    id: Date.now(),
+                    name: currentCookingRecipe.title,
+                    ingredients: currentCookingRecipe.ingredients.join(', '),
+                    kcal: currentCookingRecipe.kcal,
+                    protein: currentCookingRecipe.protein,
+                    carbs: currentCookingRecipe.carbs,
+                    fat: currentCookingRecipe.fat,
+                    time: currentCookingRecipe.category || 'Lunch',
+                    icon: '🍲',
+                    photo: currentCookingRecipe.image
+                };
+
+                AppState.meals.unshift(mealEntry);
+                AppState.nutrition.currentKcal += currentCookingRecipe.kcal;
+                saveAppState();
+
+                closeModal('modal-cooking-steps');
+                renderMealLogs();
+                updateNutritionUI();
+                switchTab('journal');
+            }
+        }
+
+        // Quiz Engine
+        const QUIZ_DATA = [
+            {
+                q: "Which ingredient helps retain vitamins best when cooked briefly?",
+                options: ["Overboiled Spinach", "Lightly Steamed Spinach", "Deep Fried Spinach"],
+                ans: 1
+            },
+            {
+                q: "How should white tofu be stored to prolong freshness?",
+                options: ["In sealed water in fridge", "In open warm tray", "Under direct sun"],
+                ans: 0
+            },
+            {
+                q: "What is a major benefit of maintaining 2.5L daily hydration?",
+                options: ["Increases fatigue", "Improves digestion & metabolism", "Dries out skin"],
+                ans: 1
+            }
+        ];
+
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+
+        function startQuiz() {
+            quizCurrentIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-intro-card').classList.add('hidden');
+            document.getElementById('quiz-result-card').classList.add('hidden');
+            document.getElementById('quiz-play-card').classList.remove('hidden');
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const data = QUIZ_DATA[quizCurrentIndex];
+            document.getElementById('quiz-step-text').innerText = `Question ${quizCurrentIndex + 1} of ${QUIZ_DATA.length}`;
+            document.getElementById('quiz-question').innerText = data.q;
+
+            const opts = document.getElementById('quiz-options');
+            opts.innerHTML = '';
+
+            data.options.forEach((opt, idx) => {
+                opts.innerHTML += `
+                    <button onclick="selectQuizOption(${idx})" class="w-full text-left bg-white/10 hover:bg-white/20 p-2.5 rounded-xl text-xs font-semibold border border-white/10 transition">
+                        ${opt}
+                    </button>
+                `;
+            });
+        }
+
+        function selectQuizOption(idx) {
+            if (idx === QUIZ_DATA[quizCurrentIndex].ans) {
+                quizScore += 10;
+            }
+
+            quizCurrentIndex++;
+            if (quizCurrentIndex < QUIZ_DATA.length) {
+                renderQuizQuestion();
+            } else {
+                document.getElementById('quiz-play-card').classList.add('hidden');
+                document.getElementById('quiz-result-card').classList.remove('hidden');
+                document.getElementById('quiz-final-score').innerText = `+${quizScore} Points`;
+            }
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-result-card').classList.add('hidden');
+            document.getElementById('quiz-intro-card').classList.remove('hidden');
+        }
+
+        function useQuickPrompt(text) {
+            document.getElementById('chat-input').value = text;
+            sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `
+                <div class="bg-emerald-600 text-white p-2.5 rounded-2xl rounded-tr-none max-w-[85%] ml-auto">
+                    ${val}
+                </div>
+            `;
+
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            setTimeout(() => {
+                chatBox.innerHTML += `
+                    <div class="bg-emerald-50 text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] border border-emerald-100">
+                        Great query! Based on your <b>${AppState.user.diet}</b> diet, incorporating fresh greens like spinach with white tofu is an excellent choice for purine-safe protein! 🥗
+                    </div>
+                `;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        }
+
+        function updateDashboardStats() {
+            if (balanceChartInstance) balanceChartInstance.destroy();
+            if (macroChartInstance) macroChartInstance.destroy();
+
+            const ctx1 = document.getElementById('balanceChart')?.getContext('2d');
+            if (ctx1) {
+                balanceChartInstance = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [
+                            {
+                                label: 'Efficiency %',
+                                data: [75, 80, 82, 85, 92, 92, 89],
+                                borderColor: '#0d9488',
+                                backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Nutrition %',
+                                data: [80, 85, 88, 90, 89, 91, 90],
+                                borderColor: '#10b981',
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { min: 60, max: 100 } }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('macroDoughnutChart')?.getContext('2d');
+            if (ctx2) {
+                macroChartInstance = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Carbs', 'Protein', 'Fats', 'Fiber'],
+                        datasets: [{
+                            data: [50, 25, 15, 10],
+                            backgroundColor: ['#10b981', '#14b8a6', '#fbbf24', '#6366f1']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+
+        function generateNextWeekTargets() {
+            document.getElementById('next-week-targets-container').classList.remove('hidden');
+        }
+
+        function switchAddTab(tab) {
+            ['manual', 'voice', 'photo'].forEach(t => {
+                const btn = document.getElementById(`add-tab-${t}`);
+                const content = document.getElementById(`add-content-${t}`);
+                if (t === tab) {
+                    btn.classList.add('bg-white', 'text-emerald-700', 'shadow-sm');
+                    btn.classList.remove('text-slate-600');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('bg-white', 'text-emerald-700', 'shadow-sm');
+                    btn.classList.add('text-slate-600');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        function simulateVoiceRecord() {
+            document.getElementById('voice-status-text').innerText = "Listening... '1 liter fresh milk recognized!'";
+            setTimeout(() => {
+                AppState.fridge.unshift({
+                    id: Date.now(),
+                    name: "Fresh Milk",
+                    category: "Dairy & Drinks",
+                    daysLeft: 5,
+                    quantity: 1,
+                    unit: "liter",
+                    timeframe: "5 Days Left",
+                    status: "active",
+                    icon: "🥛"
+                });
+                saveAppState();
+                closeModal('modal-add-fridge');
+                renderFridgeItems();
+            }, 1800);
+        }
+
+        function simulatePhotoScan() {
+            closeModal('modal-add-fridge');
+            alert('Receipt scanned! 2 items added to your fridge stock.');
+            AppState.fridge.unshift(
+                { id: Date.now(), name: "Carrots", category: "Vegetables", daysLeft: 4, quantity: 3, unit: "pcs", timeframe: "4 Days Left", status: "active", icon: "🥕" },
+                { id: Date.now() + 1, name: "Greek Yogurt", category: "Dairy & Drinks", daysLeft: 6, quantity: 2, unit: "pcs", timeframe: "6 Days Left", status: "active", icon: "🥣" }
+            );
+            saveAppState();
+            renderFridgeItems();
+        }
+    </script>
+</body>
+</html>
